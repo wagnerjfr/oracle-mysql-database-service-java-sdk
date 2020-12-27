@@ -29,6 +29,7 @@ import com.oracle.bmc.mysql.responses.StartDbSystemResponse;
 import com.oracle.bmc.mysql.responses.StopDbSystemResponse;
 import com.oracle.bmc.mysql.responses.UpdateDbSystemResponse;
 
+import com.oracle.mysql.cloud.maas.JociDbSystem;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -42,7 +43,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DbSystemManager extends AbstractManager<DbSystem, LifecycleState> {
 
-    private final DbSystemClient dbSystemClient;
+    private final JociDbSystem dbSystemClient;
     private final Duration dbSystemCreateTimeout;
     private final Duration dbSystemDeleteTimeout;
     private final Duration dbSystemUpdatingTimeout;

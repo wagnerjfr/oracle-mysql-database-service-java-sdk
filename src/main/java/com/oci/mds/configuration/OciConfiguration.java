@@ -3,10 +3,16 @@ package com.oci.mds.configuration;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.oracle.bmc.ConfigFileReader;
 import com.oracle.bmc.auth.BasicAuthenticationDetailsProvider;
-import com.oracle.bmc.identity.IdentityClient;
-import com.oracle.bmc.mysql.DbBackupsClient;
-import com.oracle.bmc.mysql.DbSystemClient;
-import com.oracle.bmc.mysql.MysqlaasClient;
+import com.oracle.mysql.cloud.Joci;
+import com.oracle.mysql.cloud.JociClients;
+import com.oracle.mysql.cloud.JociException;
+import com.oracle.mysql.cloud.JociFactory;
+import com.oracle.mysql.cloud.configuration.Bindings;
+import com.oracle.mysql.cloud.configuration.CloudConfiguration;
+import com.oracle.mysql.cloud.core.JociIdentity;
+import com.oracle.mysql.cloud.maas.JociConfiguration;
+import com.oracle.mysql.cloud.maas.JociDbBackups;
+import com.oracle.mysql.cloud.maas.JociDbSystem;
 import io.dropwizard.Configuration;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +28,7 @@ import java.util.Properties;
     "configWithProfile",
     "provider",
     "identityClient",
-    "mysqlaasClient",
+    "configurationClient",
     "dbSystemClient",
     "dbBackupsClient",
     "analyticsClient",
@@ -49,10 +55,10 @@ public class OciConfiguration extends Configuration {
     protected ConfigFileReader.ConfigFile configWithProfile = null;
     protected BasicAuthenticationDetailsProvider provider = null;
 
-    protected IdentityClient identityClient;
-    protected MysqlaasClient mysqlaasClient;
-    protected DbSystemClient dbSystemClient;
-    protected DbBackupsClient dbBackupsClient;
+    //protected JociIdentity identityClient;
+    //protected JociConfiguration configurationClient;
+    protected JociDbSystem dbSystemClient;
+    protected JociDbBackups dbBackupsClient;
 
     OciConfiguration() {
         try {
@@ -76,13 +82,27 @@ public class OciConfiguration extends Configuration {
 
             clientTenancyId = configWithProfile.get("tenancy");
 
-            dbBackupsClient = new DbBackupsClient(provider);
-            dbSystemClient = new DbSystemClient(provider);
-            identityClient = new IdentityClient(provider);
-            mysqlaasClient = new MysqlaasClient(provider);
-
         } catch (Exception ex) {
             log.error(ex.getMessage());
         }
+    }
+
+    public void setUpClients(String mysqlClientEndpoint, String compartmentId) throws JociException {
+        CloudConfiguration cloudConfiguration = new CloudConfiguration(ociConfigPath, provider, mysqlClientEndpoint, availabilityDomain, compartmentId, null);
+
+        // JAVA
+        //Bindings bindings = new Bindings("", "", "");
+        //Joci joci = JociFactory.instantiate(cloudConfiguration, bindings, JociClients.JAVA_SDK);
+
+        // CLI
+        String cliPath = System.getProperty("user.home") + "/bin/oci";
+        String execPath = System.getProperty("user.home") + "/joci-cli/test/";
+        Bindings bindings = new Bindings(cliPath, execPath, execPath);
+        Joci joci = JociFactory.instantiate(cloudConfiguration, bindings, JociClients.CLI);
+
+        dbBackupsClient = joci.maas().getDbBackups();
+        dbSystemClient = joci.maas().getDbSystem();
+        //identityClient = joci.core().identity();
+        //configurationClient = joci.maas().getConfiguration();
     }
 }

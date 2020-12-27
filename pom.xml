@@ -82,6 +82,12 @@
             <version>${typesafe-version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.oracle.mysql.cloud</groupId>
+            <artifactId>jocicli</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
     <build>

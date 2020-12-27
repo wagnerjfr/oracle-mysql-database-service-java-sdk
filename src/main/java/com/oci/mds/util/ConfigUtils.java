@@ -2,7 +2,6 @@ package com.oci.mds.util;
 
 import com.oci.mds.configuration.ProjectConfiguration;
 
-import com.oracle.bmc.mysql.MysqlaasClient;
 import com.oracle.bmc.mysql.model.Configuration;
 import com.oracle.bmc.mysql.model.Configuration.LifecycleState;
 import com.oracle.bmc.mysql.model.ConfigurationSummary;
@@ -19,19 +18,20 @@ import com.oracle.bmc.mysql.responses.DeleteConfigurationResponse;
 import com.oracle.bmc.mysql.responses.GetConfigurationResponse;
 import com.oracle.bmc.mysql.responses.UpdateConfigurationResponse;
 
+import com.oracle.mysql.cloud.maas.JociConfiguration;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @Slf4j
 public class ConfigUtils {
-    private MysqlaasClient mysqlaasClient;
+    private JociConfiguration configurationClient;
     private String compartmentId;
     private String shape;
 
 
     public ConfigUtils(ProjectConfiguration config) {
-        this.mysqlaasClient = config.getMysqlaasClient();
+        //this.configurationClient = config.getConfigurationClient();
         this.compartmentId = config.getCompartmentId();
         this.shape = config.getMysqlInstanceComputeShape();
     }
@@ -41,7 +41,7 @@ public class ConfigUtils {
             CreateConfigurationRequest.builder()
                 .createConfigurationDetails(createConfigurationDetails)
                 .build();
-        return mysqlaasClient.createConfiguration(request);
+        return configurationClient.createConfiguration(request);
     }
 
     public String createConfiguration() {
@@ -58,7 +58,7 @@ public class ConfigUtils {
             .createConfigurationDetails(createConfigurationDetails)
             .build();
 
-        final CreateConfigurationResponse configuration = mysqlaasClient.createConfiguration(request);
+        final CreateConfigurationResponse configuration = configurationClient.createConfiguration(request);
         Configuration originalConfiguration = configuration.getConfiguration();
 
         return originalConfiguration.getId();
@@ -70,7 +70,7 @@ public class ConfigUtils {
                 .updateConfigurationDetails(updateConfigurationDetails)
                 .configurationId(configurationId)
                 .build();
-        return mysqlaasClient.updateConfiguration(request);
+        return configurationClient.updateConfiguration(request);
     }
 
     public Configuration getConfiguration(String configurationId) {
@@ -78,7 +78,7 @@ public class ConfigUtils {
             GetConfigurationRequest.builder()
                 .configurationId(configurationId)
                 .build();
-        return mysqlaasClient.getConfiguration(configurationRequest).getConfiguration();
+        return configurationClient.getConfiguration(configurationRequest).getConfiguration();
     }
 
     public LifecycleState getLifecycleState(String configurationId) {
@@ -86,7 +86,7 @@ public class ConfigUtils {
             GetConfigurationRequest.builder()
                 .configurationId(configurationId)
                 .build();
-        return mysqlaasClient.getConfiguration(configurationRequest).getConfiguration().getLifecycleState();
+        return configurationClient.getConfiguration(configurationRequest).getConfiguration().getLifecycleState();
     }
 
     public DeleteConfigurationResponse deleteConfiguration(String configurationId) {
@@ -94,7 +94,7 @@ public class ConfigUtils {
             DeleteConfigurationRequest.builder()
                 .configurationId(configurationId)
                 .build();
-        return mysqlaasClient.deleteConfiguration(request);
+        return configurationClient.deleteConfiguration(request);
     }
 
     public boolean isConfigurationInCompartmentList(String configurationId) {
@@ -112,14 +112,14 @@ public class ConfigUtils {
         final ListConfigurationsRequest configurationRequest =
             ListConfigurationsRequest.builder()
                 .compartmentId(compartmentId).build();
-        return mysqlaasClient.listConfigurations(configurationRequest).getItems();
+        return configurationClient.listConfigurations(configurationRequest).getItems();
     }
 
     public List<ConfigurationSummary> getConfigurationsList(String userCompartmentId) {
         final ListConfigurationsRequest configurationRequest =
             ListConfigurationsRequest.builder()
                 .compartmentId(userCompartmentId).build();
-        return mysqlaasClient.listConfigurations(configurationRequest).getItems();
+        return configurationClient.listConfigurations(configurationRequest).getItems();
     }
 
     public List<ConfigurationSummary> getConfigurationsList(String displayName, int limit, LifecycleState lifecycleState) {
@@ -131,7 +131,7 @@ public class ConfigUtils {
                 .lifecycleState(lifecycleState)
                 .limit(limit)
                 .build();
-        return mysqlaasClient.listConfigurations(
+        return configurationClient.listConfigurations(
             configurationRequest).getItems();
     }
 
@@ -139,7 +139,7 @@ public class ConfigUtils {
         final GetConfigurationRequest configurationRequest =
             GetConfigurationRequest.builder()
                 .configurationId(id).build();
-        return mysqlaasClient.getConfiguration(configurationRequest);
+        return configurationClient.getConfiguration(configurationRequest);
     }
 
     public String getBuiltInConfigurationIdByShape(String compartmentId, String shapeName) {

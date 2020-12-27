@@ -59,8 +59,9 @@ public class DbSystemDetailsSetup {
 
         ImmutableMap<String, Map<String, Object>> definedTags = null;
 
-        final String configurationId = new ConfigUtils(config)
-            .getBuiltInConfigurationIdByShape(config.getCompartmentId(), config.getMysqlInstanceComputeShape());
+        final String configurationId = null;
+        //final String configurationId = new ConfigUtils(config)
+        //    .getBuiltInConfigurationIdByShape(config.getCompartmentId(), config.getMysqlInstanceComputeShape());
 
         final CreateBackupPolicyDetails createBackupPolicyDetails =
             CreateBackupPolicyDetails.builder()

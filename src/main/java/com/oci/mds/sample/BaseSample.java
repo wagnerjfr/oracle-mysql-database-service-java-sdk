@@ -5,6 +5,7 @@ import com.oci.mds.manager.DbBackupsManager;
 import com.oci.mds.manager.DbSystemManager;
 import com.oci.mds.util.OciUtils;
 import com.oci.mds.util.ShutDownHook;
+import com.oracle.mysql.cloud.JociException;
 
 import java.time.Duration;
 
@@ -25,6 +26,22 @@ public abstract class BaseSample {
 
     BaseSample(ProjectConfiguration config) {
         this.config = config;
+
+        mysqlClientEndpoint = config.getMysqlClientEndpoint();
+
+        OciUtils ociUtils = new OciUtils(config);
+
+        // Set availability Domain based on configuration.
+        config.setAvailabilityDomain(
+            config.getLogicalADName() != null
+                ? config.getLogicalADName() : ociUtils.getConfiguredAvailabilityDomain());
+
+        try {
+            config.setUpClients(mysqlClientEndpoint, config.getCompartmentId());
+        } catch (JociException e) {
+            e.printStackTrace();
+        }
+
         setup();
     }
 
@@ -37,19 +54,10 @@ public abstract class BaseSample {
             .dbBackupsManager(dbBackupsManager)
             .build());
 
-        OciUtils ociUtils = new OciUtils(config);
-
-        // Set availability Domain based on configuration.
-        config.setAvailabilityDomain(
-            config.getLogicalADName() != null
-                ? config.getLogicalADName() : ociUtils.getConfiguredAvailabilityDomain());
-
-        mysqlClientEndpoint = config.getMysqlClientEndpoint();
-
         if (!mysqlClientEndpoint.isEmpty()) {
-            config.getDbBackupsClient().setEndpoint(mysqlClientEndpoint);
-            config.getDbSystemClient().setEndpoint(mysqlClientEndpoint);
-            config.getMysqlaasClient().setEndpoint(mysqlClientEndpoint);
+            //config.getDbBackupsClient().setEndpoint(mysqlClientEndpoint);
+            //config.getDbSystemClient().setEndpoint(mysqlClientEndpoint);
+            //config.getMysqlaasClient().setEndpoint(mysqlClientEndpoint);
         }
 
         initTimeouts();

@@ -8,6 +8,7 @@ import com.oracle.bmc.identity.IdentityClient;
 import com.oracle.bmc.identity.model.AvailabilityDomain;
 import com.oracle.bmc.identity.requests.ListAvailabilityDomainsRequest;
 
+import com.oracle.mysql.cloud.core.JociIdentity;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -16,15 +17,15 @@ import java.util.List;
 @Slf4j
 public class OciUtils {
 
-    private IdentityClient identityClient;
+    private JociIdentity identityClient;
     private ProjectConfiguration config;
 
     private static final String AVAILABILITY_DOMAIN = "AVAILABILITY_DOMAIN";
 
     public OciUtils(ProjectConfiguration config) {
         this.config = config;
-        this.identityClient = config.getIdentityClient();
-        this.identityClient.setEndpoint(config.getMysqlClientEndpoint());
+        //this.identityClient = config.getIdentityClient();
+        //this.identityClient.setEndpoint(config.getMysqlClientEndpoint());
     }
 
     public String getConfiguredAvailabilityDomain() {

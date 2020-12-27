@@ -19,6 +19,7 @@ import com.oracle.bmc.mysql.responses.DeleteBackupResponse;
 import com.oracle.bmc.mysql.responses.GetBackupResponse;
 import com.oracle.bmc.mysql.responses.ListBackupsResponse;
 import com.oracle.bmc.mysql.responses.UpdateBackupResponse;
+import com.oracle.mysql.cloud.maas.JociDbBackups;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -35,7 +36,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @Slf4j
 public class DbBackupsManager extends AbstractManager<Backup, LifecycleState> {
 
-    private final DbBackupsClient dbBackupsClient;
+    private final JociDbBackups dbBackupsClient;
     private final Duration backupCreateTimeout;
     private final Duration backupDeleteTimeout;
     private List<String> dbBackupIds;
